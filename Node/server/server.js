@@ -46,28 +46,41 @@ const server= http.createServer((req,res)=>{
             body+=chunks.toString();
         });
         req.on('end',()=>{
-            console.log(body);
+            console.log("body : ", body);
+            //let datas = querystring.parse(body);
 
-            let datas=querystring.parse(body);
-            console.log(datas);
-            console.log(datas.name);
-            console.log(datas.email);
-            console.log(datas.pass);
+            let datas = JSON.parse(body);
+            console.log("datas : ",datas);
+
+            let name = datas.name;
+            let email = datas.email;
+            let password = datas.password;
+
+            console.log("name : ", datas.name);
+            console.log("email : ", datas.email);
+            console.log("password :", datas.password);
+
+            //validate
+            if(!name){
+                res.writeHea(400,{'content-type' : 'text/plain'});
+                res.end("Invalid name");
+                return;
+            }
 
             //save to data base
 
             collection.insertOne({
                 name:datas.name,
                 email:datas.email,
-                pass:datas.pass,
+                password:datas.password,
             })
             .then((message)=>{
-                console.log("message",message);
+                console.log("message : ", message);
                 res.writeHead(201,{"Content-Type":"text/plain"});
                 res.end("user created successfully");
             })
             .catch((error)=>{
-                console.log("error", error);
+                console.log("error : ", error);
 
                 res.writeHead(400,{"Content-Type":"text/plain"});
                 res.end(error.message?error.message:"user created failed");
